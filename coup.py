@@ -82,8 +82,9 @@ class Game:
             while(invalid_response):
                 print(f"Who is challenging {current_player.name}?")
                 for name in self.players:
-                    if name.name != current_player.name and self.players_dictionary[name].alive:
-                        print(name.name)
+                    if name.name != current_player.name:
+                        if name.alive:
+                            print(name.name)
                 challenger = input()
                 if challenger in self.players_dictionary and challenger != current_player.name:
                     challenger_player = self.players_dictionary[challenger]
@@ -457,7 +458,7 @@ class Game:
                 print("Game Over")
                 for player in self.players:
                     if player.alive:
-                        print(f"{player} has won the game!")
+                        print(f"{player.name} has won the game!")
                         break
                 quit_game = True
             self.turn = (self.turn + 1) % self.num_players
@@ -468,6 +469,7 @@ class Game:
 #Bugs:
 #If BS calls on inspect and last card, inspect will still ask to see last card
 #If BS on steal, it will still ask if someone wants to block after
+#When losing in certain times, game will crash (bs on assassin fails)
 def main():
     # Prompting the user
     print("Welcome to the game of Coup!")

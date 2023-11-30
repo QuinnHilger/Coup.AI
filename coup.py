@@ -77,11 +77,29 @@ class Game:
                     print(f"{current_player.name}'s taking income")
                     current_player.coins = current_player.coins + 1
                 elif move == 'foreign aid':
-                    #Blockable
                     print("foreign aid")
-                    print(f"{current_player.name}'s collecting foreign aid")
-                    #Block here
-                    current_player.coins = current_player.coins + 2
+                    print(f"{current_player.name} is attempting to collect foreign aid")
+                    response = input("Does anybody want to block the foreign aid? (yes/no) ").lower()
+                    if response == 'yes':
+                        invalid_response = True
+                        while(invalid_response):
+                            print("Who is claiming to block the foreign aid? ")
+                            for name in self.players:
+                                if name.name != current_player.name:
+                                    print(name.name)
+                            blocker = input()
+                            if blocker in self.players and blocker != current_player.name:
+                                blocker_player = self.players_dictionary[blocker]
+                                if blocker_player.alive:
+                                    invalid_response = False
+                                else:
+                                    print(f"{blocker} is dead")
+                            else:
+                                print(f"{blocker} is not a valid player")
+                        #Challenge block here
+                    else:
+                        print(f"{current_player.name}'s collecting foreign aid")
+                        current_player.coins = current_player.coins + 2
                 elif move == 'tax':
                     print("tax")
                     #Challengeable
@@ -95,40 +113,47 @@ class Game:
                     while invalid_response:
                         print("Who would you like to steal from : ")
                         for name in self.players:
-                            if name.name != current_player.name:
+                            if name.name != current_player.name and name.alive:
                                 print(name.name)
                         steal_victum = input()
                         if steal_victum in self.players_dictionary and steal_victum != current_player.name:
                             if self.players_dictionary[steal_victum].coins == 0:
                                 print("This player has no coins")
-                                break
+                                correct_move = False
+                                continue
                             invalid_response = False
                     steal_victum_player = self.players_dictionary[steal_victum]
                     print(f"{current_player.name}'s is stealing from {steal_victum}")
                     #Block Here
-                    #Challenge Here
-                    if steal_victum_player.coins > 1:
-                        print("Stole 2 coins")
-                        steal_victum_player.coins = steal_victum_player.coins - 2
-                        current_player.coins = current_player.coins + 2
-                    elif steal_victum_player.coins == 1:
-                        print("Stole 1 coin")
-                        steal_victum_player.coins = steal_victum_player.coins - 1
-                        current_player.coins = current_player.coins + 1
+                    response = input(f"{steal_victum}, do you want to block? (yes/no) ")
+                    if response == "yes":
+                        #Challenge block
+                        print(f"{steal_victum} is claiming to block the steal.")
+                    else:
+                        #Challenge Here
+                        if steal_victum_player.coins > 1:
+                            print("Stole 2 coins")
+                            steal_victum_player.coins = steal_victum_player.coins - 2
+                            current_player.coins = current_player.coins + 2
+                        elif steal_victum_player.coins == 1:
+                            print("Stole 1 coin")
+                            steal_victum_player.coins = steal_victum_player.coins - 1
+                            current_player.coins = current_player.coins + 1
                 elif move == 'assassinate':
                     print("assassinate")
                     if current_player.coins >= 3:
                         current_player.coins = current_player.coins - 3
                     else:
                         print("You do not have enough coins to assassin")
-                        break
+                        correct_move = False
+                        continue
                         #Re loop the actions available
                     #Blockable and Challengeable
                     invalid_response = True
                     while invalid_response:
                         print("Who would you like to assassinate: ")
                         for name in self.players:
-                            if name.name != current_player.name:
+                            if name.name != current_player.name and name.alive:
                                 print(name.name)
                         assassin_victum = input()
 
@@ -176,13 +201,14 @@ class Game:
                         current_player.coins = current_player.coins - 7
                     else:
                         print("You do not have enough coins to coup")
-                        break
+                        correct_move = False
+                        continue
                         #Re loop the actions available
                     invalid_response = True
                     while invalid_response:
                         print("Who would you like to coup: ")
                         for name in self.players:
-                            if name.name != current_player.name:
+                            if name.name != current_player.name and name.alive:
                                 print(name.name)
                         assassin_victum = input()
                         if assassin_victum in self.players_dictionary and assassin_victum != current_player.name:
@@ -271,7 +297,39 @@ class Game:
                             current_player.card2 == top_card
                 elif move == 'inspect':
                     print("inspect")
-
+                    invalid_response = True
+                    while invalid_response:
+                        print("Who would you like to inspect: ")
+                        for name in self.players:
+                            if name.name != current_player.name and name.alive:
+                                print(name.name)
+                        inspection_victum = input()
+                        if inspection_victum in self.players_dictionary and inspection_victum != current_player.name:
+                            inspection_victum_player = self.players_dictionary[inspection_victum]
+                            if inspection_victum_player.alive == True:
+                                invalid_response = False
+                            else:
+                                print(f"{inspection_victum} is dead")
+                    inspection_victum_player = self.players_dictionary[inspection_victum]
+                    if inspection_victum_player.card1 != None and inspection_victum_player.card2 != None:
+                        invalid_response = True
+                        while(invalid_response):
+                            print("What card would you like to show? ")
+                            print(f"{inspection_victum_player.card1} or {inspection_victum_player.card2}")
+                            chosen_card = input()
+                            if chosen_card == inspection_victum_player.card1 or chosen_card == inspection_victum_player.card2:
+                                invalid_response = False
+                            else:
+                                print("Invalid input")
+                    print(f"{inspection_victum} showed you {chosen_card}. Do you want them to keep it or exchange? (keep/exchange) ")
+                    response = input()
+                    if response == 'exchange':
+                        print(f"{inspection_victum} is exchanging card for a new one")
+                        self.deck.append(chosen_card)
+                        if inspection_victum_player.card1 == chosen_card:
+                            inspection_victum_player.card1 = self.deck.pop(0)
+                        else:
+                            inspection_victum_player.card2 = self.deck.pop(0)
                 else:
                     print("invalid move, try again? ")
                     correct_move = False
@@ -282,9 +340,6 @@ class Game:
             if quit_game == True:
                 break
 #TO DO
-#Inspect
-#Block Steal
-#Block Foreign Aid
 #Challenge
 #Display all cards on the table
 def main():

@@ -88,7 +88,7 @@ class Game:
                                 if name.name != current_player.name:
                                     print(name.name)
                             blocker = input()
-                            if blocker in self.players and blocker != current_player.name:
+                            if blocker in self.players_dictionary and blocker != current_player.name:
                                 blocker_player = self.players_dictionary[blocker]
                                 if blocker_player.alive:
                                     invalid_response = False
